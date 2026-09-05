@@ -26,6 +26,8 @@ import androidx.media3.exoplayer.offline.DownloadNotificationHelper
 import com.ozyern.exhale.innertube.YouTube
 import com.ozyern.exhale.innertube.models.YouTubeClient
 import com.ozyern.exhale.constants.AudioQuality
+import com.ozyern.exhale.constants.AudioCodec
+import com.ozyern.exhale.constants.AudioCodecKey
 import com.ozyern.exhale.constants.AudioQualityKey
 import com.ozyern.exhale.constants.PlayerStreamClient
 import com.ozyern.exhale.constants.PlayerStreamClientKey
@@ -64,6 +66,7 @@ constructor(
 ) {
     private val connectivityManager = context.getSystemService<ConnectivityManager>()!!
     private val audioQuality by enumPreference(context, AudioQualityKey, AudioQuality.HIGHEST)
+    private val preferredAudioCodec by enumPreference(context, AudioCodecKey, AudioCodec.AAC)
     private val preferredStreamClient by enumPreference(context, PlayerStreamClientKey, PlayerStreamClient.ANDROID_VR)
     private val songUrlCache = HashMap<String, Pair<String, Long>>()
     private val avoidStreamCodecs: Set<String> by lazy {
@@ -162,6 +165,7 @@ constructor(
                     connectivityManager = connectivityManager,
                     networkMetered = networkMeteredPref,
                     avoidCodecs = avoidStreamCodecs,
+                    preferredCodec = preferredAudioCodec,
                 )
             }.getOrThrow()
             val format = playbackData.format

@@ -10,6 +10,7 @@ package com.ozyern.exhale.utils
 
 import android.net.ConnectivityManager
 import androidx.media3.common.PlaybackException
+import com.ozyern.exhale.constants.AudioCodec
 import com.ozyern.exhale.constants.AudioQuality
 import com.ozyern.exhale.constants.PlayerStreamClient
 import com.ozyern.exhale.innertube.NewPipeUtils
@@ -201,6 +202,7 @@ object YTPlayerUtils {
         // if provided, this preference overrides ConnectivityManager.isActiveNetworkMetered
         networkMetered: Boolean? = null,
         avoidCodecs: Set<String> = emptySet(),
+        preferredCodec: AudioCodec = AudioCodec.AUTO,
     ): Result<PlaybackData> = runCatching {
         val attempts =
             when (audioQuality) {
@@ -223,6 +225,7 @@ object YTPlayerUtils {
                         preferredStreamClient = preferredStreamClient,
                         networkMetered = networkMetered,
                         avoidCodecs = avoidCodecs,
+                        preferredCodec = preferredCodec,
                     )
                 }
             if (attemptResult.isSuccess) return@runCatching attemptResult.getOrThrow()
@@ -239,6 +242,7 @@ object YTPlayerUtils {
         preferredStreamClient: PlayerStreamClient,
         networkMetered: Boolean?,
         avoidCodecs: Set<String>,
+        preferredCodec: AudioCodec,
     ): PlaybackData {
         Timber.tag(logTag).i("Fetching player response for videoId: $videoId, playlistId: $playlistId")
         val signatureTimestamp = getSignatureTimestampOrNull(videoId)
@@ -355,6 +359,7 @@ object YTPlayerUtils {
                     audioQuality,
                     isMetered,
                     avoidCodecs = avoidCodecs,
+                    preferredCodec = preferredCodec,
                 )
 
             if (candidates.isEmpty()) continue
@@ -406,7 +411,10 @@ object YTPlayerUtils {
 
                 // MAX mode: keep the better of what we had and what this client offered.
                 val incumbent = best
-                if (incumbent == null || validated.format.bitrate > incumbent.format.bitrate) {
+                if (incumbent == null ||
+                    formatScore(validated.format, preferredCodec) >
+                    formatScore(incumbent.format, preferredCodec)
+                ) {
                     best = validated
                 }
 
@@ -441,7 +449,9 @@ object YTPlayerUtils {
         // when no single client cleared the target on its own.
         best?.let { winner ->
             val current = format
-            if (current == null || winner.format.bitrate > current.bitrate) {
+            if (current == null ||
+                formatScore(winner.format, preferredCodec) > formatScore(current, preferredCodec)
+            ) {
                 Timber.tag(logTag).i(
                     "Best available across all clients: ${winner.clientName} @ ${winner.format.bitrate}bps"
                 )
@@ -546,6 +556,7 @@ object YTPlayerUtils {
         // optional override from user preference; if non-null, use this instead of ConnectivityManager
         networkMetered: Boolean? = null,
         avoidCodecs: Set<String> = emptySet(),
+        preferredCodec: AudioCodec = AudioCodec.AUTO,
     ): PlayerResponse.StreamingData.Format? {
         val isMetered = networkMetered ?: connectivityManager.isActiveNetworkMetered
         return selectAudioFormatCandidates(
@@ -553,6 +564,7 @@ object YTPlayerUtils {
             audioQuality,
             isMetered,
             avoidCodecs = avoidCodecs,
+            preferredCodec = preferredCodec,
         ).firstOrNull()
     }
 
@@ -561,6 +573,7 @@ object YTPlayerUtils {
         audioQuality: AudioQuality,
         networkMetered: Boolean,
         avoidCodecs: Set<String> = emptySet(),
+        preferredCodec: AudioCodec = AudioCodec.AUTO,
     ): List<PlayerResponse.StreamingData.Format> {
         Timber.tag(logTag).i("Finding format with audioQuality: $audioQuality, network metered: $networkMetered")
 
@@ -601,14 +614,21 @@ object YTPlayerUtils {
                 AudioQuality.AUTO -> null
             }
 
+        // Codec preference sits above bitrate: picking AAC has to mean AAC even when the Opus
+        // rendition is the fatter one, which on a free account it always is. It sits *below*
+        // `url != null` because a direct URL still beats a ciphered one -- deciphering can fail,
+        // and a codec preference is not worth a failed stream. With AudioCodec.AUTO the term is
+        // constant and the order collapses back to pure bitrate.
         val preferHigher =
             compareByDescending<PlayerResponse.StreamingData.Format> { it.url != null }
+                .thenByDescending { codecPriority(it, preferredCodec) }
                 .thenByDescending { it.bitrate }
                 .thenByDescending { codecRank(extractCodec(it.mimeType)) }
                 .thenByDescending { it.audioSampleRate ?: 0 }
 
         val preferLowerAboveTarget =
             compareByDescending<PlayerResponse.StreamingData.Format> { it.url != null }
+                .thenByDescending { codecPriority(it, preferredCodec) }
                 .thenBy { it.bitrate }
                 .thenByDescending { codecRank(extractCodec(it.mimeType)) }
                 .thenByDescending { it.audioSampleRate ?: 0 }
@@ -663,6 +683,42 @@ object YTPlayerUtils {
         )
         return true
     }
+
+    /**
+     * 1 when this format is the codec the user asked for, 0 otherwise.
+     *
+     * Deliberately binary rather than a ranked list. The preference answers one question --
+     * "is this the stream I wanted?" -- and everything past that is decided on bitrate, so a
+     * user who picks AAC and is served only Opus still gets the best Opus available instead of
+     * an arbitrary reshuffle.
+     */
+    private fun codecPriority(
+        format: PlayerResponse.StreamingData.Format,
+        preferred: AudioCodec,
+    ): Int {
+        if (preferred == AudioCodec.AUTO) return 0
+        val codec = extractCodec(format.mimeType)?.lowercase() ?: return 0
+        return when (preferred) {
+            AudioCodec.AAC -> if (codec.contains("mp4a")) 1 else 0
+            AudioCodec.OPUS -> if (codec.contains("opus")) 1 else 0
+            AudioCodec.AUTO -> 0
+        }
+    }
+
+    /**
+     * The value MAX mode maximises when comparing what different clients offered.
+     *
+     * It has to agree with the comparator used *within* a client, or the two fight: the
+     * selector would hand back the preferred codec from client A, and then the probe would
+     * throw it away because client B answered with a higher-bitrate stream in the codec the
+     * user asked not to have. Codec preference is the high-order term for exactly that reason;
+     * bitrate breaks ties beneath it. With [AudioCodec.AUTO] the first term is always 0 and
+     * this degenerates to a plain bitrate comparison, which is the old behaviour.
+     */
+    private fun formatScore(
+        format: PlayerResponse.StreamingData.Format,
+        preferred: AudioCodec,
+    ): Long = codecPriority(format, preferred) * 100_000_000L + format.bitrate.toLong()
 
     private fun codecRank(codec: String?): Int =
         when {

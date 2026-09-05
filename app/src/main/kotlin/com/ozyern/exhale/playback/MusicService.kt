@@ -92,6 +92,7 @@ import com.ozyern.exhale.R
 import com.ozyern.exhale.constants.AudioNormalizationKey
 import com.ozyern.exhale.constants.AudioOffload
 import com.ozyern.exhale.constants.AudioCrossfadeDurationKey
+import com.ozyern.exhale.constants.AudioCodecKey
 import com.ozyern.exhale.constants.AudioQualityKey
 import com.ozyern.exhale.constants.AutoLoadMoreKey
 import com.ozyern.exhale.constants.AutoDownloadOnLikeKey
@@ -286,6 +287,11 @@ class MusicService :
         this,
         AudioQualityKey,
         com.ozyern.exhale.constants.AudioQuality.HIGHEST
+    )
+    private val preferredAudioCodec by enumPreference(
+        this,
+        AudioCodecKey,
+        com.ozyern.exhale.constants.AudioCodec.AAC
     )
     private val preferredStreamClient by enumPreference(
         this,
@@ -4799,6 +4805,7 @@ class MusicService :
                     connectivityManager = connectivityManager,
                     preferredStreamClient = preferredStreamClient,
                     avoidCodecs = avoidStreamCodecs,
+                    preferredCodec = preferredAudioCodec,
                 )
             }.getOrElse { throwable ->
                 when (throwable) {
@@ -4934,6 +4941,7 @@ class MusicService :
                     connectivityManager = connectivityManager,
                     preferredStreamClient = preferredStreamClient,
                     avoidCodecs = avoidStreamCodecs,
+                    preferredCodec = preferredAudioCodec,
                 ).getOrNull() ?: return@runCatching
                 storeResolvedStream(mediaId, playbackData)
                 Timber.tag("StreamPrefetch").d("Prefetched stream for %s", mediaId)

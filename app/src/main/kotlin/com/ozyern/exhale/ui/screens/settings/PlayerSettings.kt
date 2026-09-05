@@ -46,6 +46,8 @@ import com.ozyern.exhale.constants.ExternalDownloaderPackageKey
 import com.ozyern.exhale.constants.AudioNormalizationKey
 import com.ozyern.exhale.constants.AudioOffload
 import com.ozyern.exhale.constants.AudioQuality
+import com.ozyern.exhale.constants.AudioCodec
+import com.ozyern.exhale.constants.AudioCodecKey
 import com.ozyern.exhale.constants.AudioQualityKey
 import com.ozyern.exhale.constants.NetworkMeteredKey
 import com.ozyern.exhale.constants.AutoDownloadOnLikeKey
@@ -90,6 +92,10 @@ fun PlayerSettings(
     val (audioQuality, onAudioQualityChange) = rememberEnumPreference(
         AudioQualityKey,
         defaultValue = AudioQuality.HIGHEST
+    )
+    val (audioCodec, onAudioCodecChange) = rememberEnumPreference(
+        AudioCodecKey,
+        defaultValue = AudioCodec.AAC
     )
     val (playerStreamClient, onPlayerStreamClientChange) = rememberEnumPreference(
         PlayerStreamClientKey,
@@ -289,6 +295,20 @@ fun PlayerSettings(
                     AudioQuality.HIGH -> stringResource(R.string.audio_quality_high)
                     AudioQuality.AUTO -> stringResource(R.string.audio_quality_auto)
                     AudioQuality.LOW -> stringResource(R.string.audio_quality_low)
+                }
+            }
+        )
+
+        EnumListPreference(
+            title = { Text(stringResource(R.string.audio_codec)) },
+            icon = { Icon(painterResource(R.drawable.waves), null) },
+            selectedValue = audioCodec,
+            onValueSelected = onAudioCodecChange,
+            valueText = {
+                when (it) {
+                    AudioCodec.AAC -> stringResource(R.string.audio_codec_aac)
+                    AudioCodec.OPUS -> stringResource(R.string.audio_codec_opus)
+                    AudioCodec.AUTO -> stringResource(R.string.audio_codec_auto)
                 }
             }
         )

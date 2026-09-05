@@ -152,6 +152,33 @@ enum class AudioQuality {
     LOW,
 }
 
+/**
+ * Which codec stream selection reaches for first.
+ *
+ * This is a *preference*, not a filter: if the chosen codec is not among the formats a client
+ * was served, selection falls through to bitrate order and plays whatever is there. Nothing
+ * here can conjure a rendition YouTube did not send.
+ *
+ * Worth knowing what the choice actually costs, because the bitrate numbers mislead. On a
+ * signed-out or free account YouTube serves exactly two music formats: Opus itag 251 (VBR,
+ * ~130-160 kbps) and AAC itag 140 (128 kbps). The 256 kbps AAC rendition, itag 141, is gated
+ * behind a Premium subscription server-side and no client spoof reaches it. So [AAC] on a free
+ * account is 128 kbps, which is *lower* than the Opus it replaces, and Opus is the more
+ * efficient codec at that rate besides.
+ *
+ * It defaults to [AAC] anyway. AAC-LC decoding is mandatory on every Android device and gets
+ * hardware offload where Opus is decoded in software, so it is the safer, cheaper stream; and
+ * on a Premium account it is the one that unlocks 256 kbps. [AUTO] is the setting for anyone
+ * who would rather have the highest bitrate on offer whatever the codec.
+ */
+val AudioCodecKey = stringPreferencesKey("audioCodec")
+
+enum class AudioCodec {
+    AAC,
+    OPUS,
+    AUTO,
+}
+
 val PlayerStreamClientKey = stringPreferencesKey("playerStreamClient")
 
 enum class PlayerStreamClient {
