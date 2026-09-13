@@ -115,5 +115,8 @@ core.*
 # with a different key and no existing install can accept it. It lives here for
 # local release builds and in repository secrets for CI, and it is never in git.
 /app/keystore/
+
+# libmpv for the desktop app is ~120 MB; fetched by desktop/scripts/fetch-libmpv.ps1.
+/desktop/resources/windows/*.dll
 *.keystore
 *.jks

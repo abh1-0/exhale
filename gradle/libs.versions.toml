@@ -159,8 +159,18 @@ dev-haze = { group = "dev.chrisbanes.haze", name = "haze", version.ref = "hazeVe
 okhttp-dnsoverhttps = { group = "com.squareup.okhttp3", name = "okhttp-dnsoverhttps", version.ref = "okhttp" }
 compose-markdown = { group = "com.github.jeziellago", name = "compose-markdown", version.ref = "composeMarkdown" }
 
+# Desktop (Windows) — Compose Multiplatform + libmpv
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+jna = { group = "net.java.dev.jna", name = "jna", version = "5.19.1" }
+kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version = "1.10.2" }
+# 2.0.1, not the app's 2.0.0: 2.0.0's desktop build links against Compose 1.11's Skiko and crashes on 1.12.
+backdrop-desktop = { group = "io.github.kyant0", name = "backdrop", version = "2.0.1" }
+compose-desktop-material3 ={ group = "org.jetbrains.compose.material3", name = "material3", version = "1.9.0" }
+compose-desktop-icons-core ={ group = "org.jetbrains.compose.material", name = "material-icons-core", version = "1.7.3" }
+
 
 [plugins]
+compose-multiplatform = { id = "org.jetbrains.compose", version = "1.12.0" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
