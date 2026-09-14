@@ -1,0 +1,42 @@
+name: Question
+description: How do I do something, or why does Exhale behave this way?
+title: "[Question] "
+labels: [question]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before you file: the [support page](https://exhale.ozyern.me/support)
+        answers the most common ones — background playback getting killed, audio
+        quality and codecs, lyrics, moving your library to a new phone, and
+        updates. Worth thirty seconds.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: What you have already tried
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: Exhale version
+      placeholder: "1.0.304"
+    validations:
+      required: false
+
+  - type: input
+    id: device
+    attributes:
+      label: Device and ROM
+      placeholder: "Pixel 8 Pro, stock Android 14"
+    validations:
+      required: false

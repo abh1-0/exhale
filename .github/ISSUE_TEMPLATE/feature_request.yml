@@ -1,0 +1,50 @@
+name: Idea or suggestion
+description: Something Exhale should do, or should do differently.
+title: "[Idea] "
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ideas are welcome. The ones that get built are the ones that describe a
+        **problem** rather than a solution — knowing what you were trying to do
+        when the app got in your way is worth more than a spec, because there is
+        often a better answer than the one either of us thought of first.
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: What you would like
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem it solves
+      description: What are you doing when you feel the lack of this?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: How you work around it today
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: Exhale version
+      placeholder: "1.0.304"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched the existing issues for this
+          required: true

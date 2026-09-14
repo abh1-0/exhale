@@ -57,9 +57,9 @@ export function TopBar() {
         <a className="hide-sm" href={REPO} target="_blank" rel="noreferrer">
           Source
         </a>
-        <a className="hide-sm" href={`${REPO}/issues`} target="_blank" rel="noreferrer">
-          Issues
-        </a>
+        <Link className="hide-sm" to="/support">
+          Support
+        </Link>
         <a
           className="hide-sm"
           href={`${REPO}/blob/master/CONTRIBUTING.md`}
@@ -164,8 +164,11 @@ export function SiteFooter({ onNotes }) {
                 </a>
               </li>
               <li>
+                <Link to="/support">Support</Link>
+              </li>
+              <li>
                 <a href={`${REPO}/issues`} target="_blank" rel="noreferrer">
-                  Report a bug
+                  Open issues
                 </a>
               </li>
               <li>

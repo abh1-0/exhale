@@ -1,0 +1,16 @@
+# The chooser GitHub shows above the templates.
+#
+# Blank issues stay enabled deliberately: the templates cover the three things
+# people file most, and someone with a fourth kind of report should not have to
+# pretend it is one of them.
+blank_issues_enabled: true
+contact_links:
+  - name: Common questions
+    url: https://exhale.ozyern.me/support
+    about: Background playback, audio quality, lyrics, backups and updates — answered without filing anything.
+  - name: Telegram
+    url: https://t.me/ozyern
+    about: For anything that isn't a bug report and doesn't belong in a public thread.
+  - name: Security issue
+    url: https://github.com/ozyern/Exhale/security/advisories/new
+    about: Report a vulnerability privately rather than in a public issue.

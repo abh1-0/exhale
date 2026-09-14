@@ -1,0 +1,109 @@
+name: Bug report
+description: Something in Exhale is broken or behaving wrongly.
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time. One thing before you start: **this issue is
+        public and permanent.** Don't paste anything you wouldn't post publicly —
+        account details, tokens, or the contents of a `cookie` field.
+
+        Arriving here from [exhale.ozyern.me/support](https://exhale.ozyern.me/support)?
+        The fields below are already filled in. Read them over and submit.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What went wrong, in a sentence or two.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected instead
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open …
+        2. Tap …
+        3. It …
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Exhale version
+      description: Settings → About.
+      placeholder: "1.0.304"
+    validations:
+      required: true
+
+  - type: input
+    id: android
+    attributes:
+      label: Android version
+      placeholder: "Android 14"
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Device
+      placeholder: "Pixel 8 Pro"
+    validations:
+      required: true
+
+  - type: input
+    id: rom
+    attributes:
+      label: ROM or skin
+      description: >
+        This matters more than you would expect. Battery management, audio
+        routing and blur support all differ between OEM builds, and plenty of
+        bugs only exist on one of them.
+      placeholder: "stock / HyperOS 2 / One UI 6 / LineageOS"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: How often does it happen
+      options:
+        - Every time
+        - Sometimes
+        - Once, and I could not reproduce it
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: >
+        Optional, and the single most useful thing you can add. With the device
+        connected over ADB: `adb logcat | grep -i exhale`
+      render: text
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched the existing issues for this
+          required: true
+        - label: I am on the latest version of Exhale
+          required: true

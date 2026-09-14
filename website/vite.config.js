@@ -2,6 +2,7 @@ import { copyFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 
 /**
  * GitHub Pages has no rewrite rule, so a deep link like /release/1.0.203 is a
@@ -22,7 +23,7 @@ const pagesFallback = () => ({
 })
 
 export default defineConfig({
-  plugins: [react(), pagesFallback()],
+  plugins: [react(), tailwindcss(), pagesFallback()],
   // Served from the root of a custom domain (exhale.ozyern.me), not from
   // /Exhale/ — so the base stays '/'. If this ever moves to a project page
   // without the CNAME, this is the one line that has to change.

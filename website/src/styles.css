@@ -3766,3 +3766,542 @@ html:has(.release) {
     animation: none;
   }
 }
+
+/* ==================================================================== support
+
+   Built to the release page's standard, not to its layout.
+
+   That page opens with a full screen of object because a release is an event
+   you arrive at to look at. This is a page you arrive at to use, usually with
+   something already broken — so it takes the craft and leaves the furniture:
+   a hero whose real job is a search box over the answers, and then straight
+   into the thing you came to do.
+
+   Two things here are specific. The fields, the section stepper and the door
+   cards are borrowed from Origin UI and Magic UI and live in components/ui,
+   styled by Tailwind through tw.css rather than here. And the FAQ is native
+   <details>, so open and closed are styled through [open] rather than through
+   a class some JavaScript has to remember to set.
+   ========================================================================= */
+
+.support main {
+  padding-bottom: clamp(80px, 12vw, 160px);
+}
+
+/* ------------------------------------------------------------ the chooser */
+
+.sp-choose {
+  padding-bottom: clamp(60px, 9vw, 120px);
+}
+
+.sp-rows {
+  border-top: 1px solid var(--hairline);
+}
+
+/* Full width, one per line. Tiles fitted in a row and read as four equal
+   options in a settings screen; these are the page's entire purpose, so they
+   get the width, and the number down the left gives the set an order. */
+.sp-row {
+  display: grid;
+  grid-template-columns: clamp(48px, 6vw, 84px) minmax(0, 1fr) 40px;
+  align-items: center;
+  gap: 0 clamp(12px, 2vw, 26px);
+  width: 100%;
+  padding: clamp(22px, 2.8vw, 34px) clamp(6px, 1.2vw, 16px);
+  border: 0;
+  border-bottom: 1px solid var(--hairline);
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.35s var(--ease), padding-left 0.45s var(--settle);
+}
+
+.sp-row:hover {
+  background: #08080a;
+  padding-left: clamp(12px, 1.8vw, 24px);
+}
+
+/* The chosen row keeps the accent so it stays findable once you have scrolled
+   down into the form it opened. */
+.sp-row[data-active='true'] {
+  background: color-mix(in oklab, var(--rose) 7%, #08080a);
+}
+
+.sp-row-n {
+  font-size: clamp(13px, 1.2vw, 15px);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--grey-dim);
+  transition: color 0.3s var(--ease);
+}
+
+.sp-row:hover .sp-row-n,
+.sp-row[data-active='true'] .sp-row-n {
+  color: var(--rose);
+}
+
+.sp-row-say {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sp-row-h {
+  font-size: clamp(21px, 2.5vw, 32px);
+  font-weight: 600;
+  line-height: 1.14;
+  letter-spacing: -0.022em;
+}
+
+.sp-row-b {
+  max-width: 56ch;
+  font-size: clamp(14.5px, 1.4vw, 16px);
+  line-height: 1.46;
+  color: var(--grey);
+}
+
+.sp-row-go {
+  justify-self: end;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.3s var(--ease), transform 0.45s var(--settle);
+}
+
+.sp-row-go svg {
+  width: 18px;
+  height: 18px;
+}
+
+.sp-row:hover .sp-row-go,
+.sp-row[data-active='true'] .sp-row-go {
+  opacity: 0.6;
+  transform: none;
+}
+
+.sp-row[data-active='true'] .sp-row-go {
+  transform: rotate(90deg);
+}
+
+/* --------------------------------------------------------------- the form */
+
+/* Said before the first field rather than under the submit button. Someone
+   about to paste a token into a public tracker needs to know beforehand. */
+.sp-public {
+  max-width: 64ch;
+  margin: clamp(28px, 3.4vw, 40px) 0 0;
+  padding: 15px 19px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in oklab, var(--ember) 30%, transparent);
+  background: color-mix(in oklab, var(--ember) 7%, transparent);
+  font-size: 14.5px;
+  line-height: 1.52;
+  color: var(--ink);
+}
+
+.sp-public b {
+  font-weight: 600;
+}
+
+.sp-public-quiet {
+  margin-top: 10px;
+  border-color: var(--hairline);
+  background: var(--tile);
+  color: var(--grey);
+}
+
+.sp-public a {
+  color: var(--rose);
+}
+
+.sp-public a:hover {
+  text-decoration: underline;
+}
+
+/* The sheet, and the light under it.
+
+   The app's own material is glass over album color, and a form on this site
+   had been a stack of outlined boxes on flat black — the one surface in the
+   whole product that looked like nothing in the product. This is the app's
+   answer instead: a frosted sheet with the theme colors burning underneath it.
+
+   Frost needs something to be frosted over, and a black page offers nothing,
+   so `.sp-glow` puts the light there on purpose. Take it away and the
+   backdrop-filter has zero work to do and the sheet reads as flat grey. */
+.sp-stage {
+  position: relative;
+  margin-top: 22px;
+  isolation: isolate;
+}
+
+.sp-glow {
+  position: absolute;
+  inset: -16% -8% -22%;
+  z-index: -1;
+  background:
+    radial-gradient(
+      46% 60% at 20% 20%,
+      color-mix(in oklab, var(--rose) 52%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      44% 58% at 84% 32%,
+      color-mix(in oklab, var(--iris) 46%, transparent),
+      transparent 72%
+    ),
+    radial-gradient(
+      42% 52% at 56% 96%,
+      color-mix(in oklab, var(--ember) 34%, transparent),
+      transparent 74%
+    );
+  filter: blur(30px);
+  opacity: 0.62;
+  pointer-events: none;
+}
+
+.sp-panel {
+  position: relative;
+  padding: clamp(24px, 3.4vw, 46px);
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(34px) saturate(150%);
+  -webkit-backdrop-filter: blur(34px) saturate(150%);
+  /* The inset hairline along the top is the lit edge of a physical sheet, and
+     it is the single detail that separates glass from a grey rectangle. */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 40px 90px -40px rgba(0, 0, 0, 0.9);
+}
+
+/* Firefox without backdrop-filter would show the glow at full strength through
+   a near-transparent panel, which is unreadable rather than merely different. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .sp-panel {
+    background: #0d0d10;
+  }
+
+  .sp-glow {
+    opacity: 0.22;
+  }
+}
+
+/* ---------------------------------------------------------------- the panes */
+
+.sp-note {
+  max-width: 62ch;
+  margin: 0 0 clamp(24px, 3vw, 32px);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--grey);
+}
+
+.sp-pane {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(22px, 2.8vw, 32px);
+}
+
+/* The device pane is four short answers, so it is a grid rather than a column
+   of full-width rules with one word sitting on each. */
+.sp-pane-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(20px, 2.6vw, 30px) clamp(24px, 3vw, 40px);
+}
+
+.sp-warn {
+  margin: 22px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ember);
+}
+
+/* -------------------------------------------------------------- the actions */
+
+.sp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 18px;
+  margin-top: clamp(28px, 3.4vw, 40px);
+  padding-top: clamp(22px, 2.6vw, 30px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sp-actions .btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* Disabled says "not yet", so it stays legible rather than dropping to 30% and
+   becoming something whose label you cannot read. */
+.sp-actions .btn:disabled {
+  cursor: not-allowed;
+  filter: grayscale(1);
+  opacity: 0.42;
+}
+
+.sp-actions .btn:disabled:hover {
+  transform: none;
+}
+
+.sp-back {
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: var(--grey);
+  font-family: inherit;
+  font-size: 15px;
+  cursor: pointer;
+  transition: color 0.2s var(--ease);
+}
+
+.sp-back:hover {
+  color: var(--ink);
+}
+
+.sp-meta {
+  font-size: 13.5px;
+  color: var(--grey);
+}
+
+.sp-sent {
+  margin: 20px 0 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--grey);
+}
+
+.sp-sent a {
+  color: var(--rose);
+  text-decoration: underline;
+}
+
+/* -------------------------------------------------------------- elsewhere */
+
+.sp-else {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+/* ------------------------------------------------------- section headings */
+
+.sp-sec-head {
+  max-width: 46ch;
+  margin-bottom: clamp(34px, 4.6vw, 60px);
+}
+
+.sp-sec-head .kicker {
+  margin-bottom: 12px;
+  color: var(--rose);
+}
+
+.sp-sec-dek {
+  margin-top: 18px;
+  font-size: clamp(16px, 1.6vw, 19px);
+  line-height: 1.5;
+  color: var(--grey);
+}
+
+/* ---------------------------------------------------------- what happens */
+
+.sp-process {
+  padding: clamp(60px, 8vw, 110px) 0 clamp(50px, 7vw, 90px);
+  border-top: 1px solid var(--hairline);
+}
+
+.sp-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: clamp(20px, 3vw, 40px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+
+.sp-step {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 22px;
+  border-top: 1px solid var(--hairline);
+}
+
+.sp-step-n {
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--rose);
+}
+
+.sp-step b {
+  font-size: clamp(17px, 1.7vw, 20px);
+  font-weight: 600;
+  letter-spacing: -0.016em;
+}
+
+.sp-step span:not(.sp-step-n) {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--grey);
+}
+
+/* ---------------------------------------------------------------- the faq */
+
+.sp-faq {
+  padding: clamp(56px, 8vw, 110px) 0 clamp(50px, 7vw, 90px);
+  border-top: 1px solid var(--hairline);
+}
+
+.sp-faq-list {
+  border-top: 1px solid var(--hairline);
+}
+
+.sp-q {
+  border-bottom: 1px solid var(--hairline);
+}
+
+.sp-q summary {
+  display: grid;
+  grid-template-columns: clamp(44px, 5.5vw, 74px) minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 0 clamp(10px, 1.6vw, 20px);
+  padding: clamp(20px, 2.4vw, 28px) clamp(6px, 1.2vw, 16px);
+  cursor: pointer;
+  list-style: none;
+  transition: background 0.3s var(--ease);
+}
+
+/* Safari draws its own triangle and ignores list-style on the summary. */
+.sp-q summary::-webkit-details-marker {
+  display: none;
+}
+
+.sp-q summary:hover {
+  background: #08080a;
+}
+
+.sp-q-n {
+  font-size: clamp(12.5px, 1.1vw, 14px);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--grey-dim);
+  transition: color 0.3s var(--ease);
+}
+
+.sp-q-t {
+  font-size: clamp(16.5px, 1.8vw, 21px);
+  font-weight: 500;
+  line-height: 1.28;
+  letter-spacing: -0.017em;
+  transition: color 0.2s var(--ease);
+}
+
+.sp-q summary:hover .sp-q-t {
+  color: var(--rose);
+}
+
+.sp-q[open] .sp-q-n {
+  color: var(--rose);
+}
+
+/* A plus that becomes a minus, drawn in CSS. Two pseudo-element bars beat an
+   icon import for something with exactly two states. */
+.sp-q-mark {
+  position: relative;
+  justify-self: end;
+  width: 15px;
+  height: 15px;
+}
+
+.sp-q-mark::before,
+.sp-q-mark::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1.5px;
+  border-radius: 2px;
+  background: var(--grey);
+  transform: translateY(-50%);
+  transition: transform 0.4s var(--settle), background 0.2s var(--ease);
+}
+
+.sp-q-mark::after {
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.sp-q[open] .sp-q-mark::after {
+  transform: translateY(-50%) rotate(0deg);
+}
+
+.sp-q[open] .sp-q-mark::before,
+.sp-q[open] .sp-q-mark::after {
+  background: var(--rose);
+}
+
+/* Indented to the same column the question sits in, so the answer reads as
+   hanging off it rather than as a new block starting at the margin. */
+.sp-q-a {
+  max-width: 70ch;
+  padding: 0 clamp(6px, 1.2vw, 16px) clamp(24px, 2.6vw, 32px);
+  margin-left: clamp(54px, 7.1vw, 94px);
+}
+
+.sp-q-a p {
+  margin-bottom: 15px;
+  font-size: 15.5px;
+  line-height: 1.64;
+  color: var(--grey);
+}
+
+.sp-q-a p:last-child {
+  margin-bottom: 0;
+}
+
+/* --------------------------------------------------------------- the tail */
+
+.sp-tail {
+  padding-top: clamp(44px, 6vw, 74px);
+  border-top: 1px solid var(--hairline);
+}
+
+/* ------------------------------------------------------------- responsive */
+
+@media (max-width: 860px) {
+  .sp-q-a {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  /* The device pane stops being two columns before its answers get too
+     narrow to read the placeholder in. */
+  .sp-pane-meta {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sp-actions .btn {
+    width: 100%;
+  }
+
+  /* The number column costs more than it gives once the title has to wrap;
+     the arrow goes with it, since hover is not a thing here anyway. */
+  .sp-row {
+    grid-template-columns: 34px minmax(0, 1fr);
+  }
+
+  .sp-row-go {
+    display: none;
+  }
+
+  .sp-q summary {
+    grid-template-columns: 34px minmax(0, 1fr) 16px;
+  }
+}

@@ -1,18 +1,20 @@
 import { useEffect } from 'react'
 import App from './App.jsx'
 import Release from './pages/Release.jsx'
+import Support from './pages/Support.jsx'
 import { RELEASE } from './release.js'
 import { useRoute } from './router.jsx'
 
 /**
- * Two pages, one string comparison.
+ * Three pages, two string comparisons.
  *
  * `/release` without a version resolves to the current one, so the short URL
  * keeps working after the next release rather than rotting into a 404 — and any
- * path that is not a release is the home page, which is what a marketing site
- * should do with a typo.
+ * path that is neither a release nor support is the home page, which is what a
+ * marketing site should do with a typo.
  */
 const isRelease = (path) => path === '/release' || path.startsWith('/release/')
+const isSupport = (path) => path === '/support' || path.startsWith('/support/')
 
 /**
  * The title and the canonical link are the two things a crawler and a preview
@@ -30,14 +32,20 @@ const HEAD = {
     description: RELEASE.dek,
     path: `/release/${RELEASE.version}`,
   },
+  support: {
+    title: 'Exhale — support',
+    description:
+      'Report a bug, suggest an idea, or find the answer outright. Background playback, audio quality, lyrics, backups and updates, answered.',
+    path: '/support',
+  },
 }
 
 export default function Site() {
   const path = useRoute()
-  const release = isRelease(path)
+  const page = isRelease(path) ? 'release' : isSupport(path) ? 'support' : 'home'
 
   useEffect(() => {
-    const head = release ? HEAD.release : HEAD.home
+    const head = HEAD[page]
     document.title = head.title
 
     const set = (selector, attribute, value) => {
@@ -50,7 +58,9 @@ export default function Site() {
     set('meta[property="og:description"]', 'content', head.description)
     set('meta[property="og:url"]', 'content', `https://exhale.ozyern.me${head.path}`)
     set('link[rel="canonical"]', 'href', `https://exhale.ozyern.me${head.path}`)
-  }, [release])
+  }, [page])
 
-  return release ? <Release /> : <App />
+  if (page === 'release') return <Release />
+  if (page === 'support') return <Support />
+  return <App />
 }
